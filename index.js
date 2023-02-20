@@ -1,14 +1,17 @@
+/*
+* Stretch Goals:
+* - Add the ability to reply to a specific tweet
+* - Save tweets, likes and retweets to localStorage
+* - Allow user to delete a tweet
+* - My own ideas:
+*     - Character limit.
+*     - Picture tweet?
+*     - Links
+*     - Hashtags
+* */
+
 import {tweetsData} from "./data.js";
-
-const tweetInput = document.getElementById("tweet-input")
-const tweetBtn = document.getElementById("tweet-btn")
-const feed = document.getElementById("feed")
-
-
-tweetBtn.addEventListener("click", ()=>{
-  console.log(tweetInput.value)
-})
-
+import {v4 as uuidv4} from 'https://jspm.dev/uuid';
 
 document.addEventListener("click", (e)=>{
   if(e.target.dataset.like){
@@ -21,7 +24,33 @@ document.addEventListener("click", (e)=>{
   else if(e.target.dataset.retweet){
     handleRetweetClick(e.target.dataset.retweet)
   }
+  else if(e.target.id === "tweet-btn"){
+    handleTweetBtnClick()
+  }
 })
+
+function handleTweetBtnClick(){
+  const tweetInput = document.getElementById("tweet-input")
+  console.log(tweetInput.value)
+  // was requested to be push, but that puts it last. Used unshift to put it first!
+  // I also made it auto liked and tweeted. Dunno if retweets start at zero.
+  if(tweetInput.value) {
+    tweetsData.unshift({
+      handle: `@houdinii 🐇`,
+      profilePic: `images/houdinii.jpg`,
+      likes: 1,
+      retweets: 1,
+      tweetText: tweetInput.value,
+      replies: [],
+      isLiked: true,
+      isRetweeted: true,
+      uuid: uuidv4(),
+    });
+    tweetInput.value = ""
+    render();
+  }
+
+}
 
 function boldLikeIcon(uuid){
   let el = document.querySelector(`[data-like='${uuid}']`)
@@ -127,6 +156,7 @@ function getFeedHtml(tweets){
 }
 
 function render(){
+  const feed = document.getElementById("feed")
   feed.innerHTML = getFeedHtml(tweetsData)
 }
 
