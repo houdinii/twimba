@@ -27,13 +27,32 @@ document.addEventListener("click", (e)=>{
   else if(e.target.id === "tweet-btn"){
     handleTweetBtnClick()
   }
+  else if(e.target.dataset.comment){
+    handleNewCommentClick(e.target.dataset.comment)
+  }
 })
+function handleNewCommentClick(uuid){
+  let commentEl = document.querySelector(`[data-comment-text="${uuid}"]`)
+  if(commentEl.value){
+    console.log(commentEl.value)
+
+    const targetTweetObject = tweetsData.filter(tweet => tweet.uuid === uuid)[0]
+
+    targetTweetObject.replies.unshift({
+      handle: `@houdinii 🐇`,
+      profilePic: `images/houdinii.jpg`,
+      tweetText: commentEl.value,
+    })
+
+    render()
+    // find array element by uuid (filter)
+    // unshift to el.replies
+
+  }
+}
 
 function handleTweetBtnClick(){
   const tweetInput = document.getElementById("tweet-input")
-  console.log(tweetInput.value)
-  // was requested to be push, but that puts it last. Used unshift to put it first!
-  // I also made it auto liked and tweeted. Dunno if retweets start at zero.
   if(tweetInput.value) {
     tweetsData.unshift({
       handle: `@houdinii 🐇`,
@@ -73,7 +92,6 @@ function handleLikeClick(tweetId){
 function handleReplyClick(tweetId){
   const targetTweetObject = tweetsData.filter(tweet => tweet.uuid === tweetId)[0]
   if(targetTweetObject.replies.length > 0){
-    // get element and then toggle it's class
     let el = document.getElementById(`replies-${tweetId}`)
     el.classList.toggle('hidden')
   }
@@ -124,6 +142,14 @@ function getFeedHtml(tweets){
             </div>
           </div>`
       }
+      repliesHtml += `
+        <div class="tweet-reply">
+          <div class="tweet-input-area">
+            <img src="images/houdinii.jpg" class="profile-pic" alt="profile pic">
+            <textarea placeholder="What's Happening?" data-comment-text="${tweet.uuid}"></textarea>
+          </div>
+          <button data-comment="${tweet.uuid}">Reply</button>
+        </div>`
     }
 
     feedHtml += `
